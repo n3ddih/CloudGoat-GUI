@@ -128,4 +128,33 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Cloudgoat gitignore
+**.swp
+**.terraform
+**tfstate
+**.tfout
+.terraform.lock.hcl
+tmp/
+__pycache__
+cloudgoat
+cloudgoat.pub
+output.txt
+
+# Configuration files:
+config.yml
+whitelist.txt
+
+# Scenario instance directories and their trash directory:
+*_cgid*/
+trash/
+
+# Editors
+.idea
+.sw[a-z]
+
+# Custom settings for this project
 cloudgoat/
+.vscode/
+core/
+scenarios/
+cg-README.md
