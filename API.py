@@ -2,6 +2,7 @@ import os
 import yaml
 from flask import jsonify
 from core.python.commands import CloudGoat
+from core.python.utils import create_or_update_yaml_file
 
 cg = CloudGoat('./')
 
@@ -37,4 +38,21 @@ def scenario_detail(scenario_id):
         'help':shelp,
         'last_updated':slast_updated
     }
-    return jsonify(results), 200
+    return jsonify(results), 200    
+
+def config_profile(profile="cloudgoat"):
+    # If the profile is not by default, use the input profile
+    if profile == "" or profile is None:
+        return "Profile name invalid!", 400
+    create_or_update_yaml_file(cg.config_path, {"default-profile": profile})
+    return "Configure successful!", 200
+    
+def configure_credentials(access_key_id, secret_access_key):
+    credentials = open('~/.aws/credentials', 'a')
+    credentials.write("\n[cloudgoat]\naws_access_key_id = "+ access_key_id +"\naws_secret_access_key = "+ secret_access_key +"\n")
+    credentials.close()
+    config = open('~/.aws/config', 'a')
+    config.write("\n[cloudgoat]\nregion = us-east-1\noutput = json")
+    config.close()
+    config_profile()
+    return "Configure successful!", 200

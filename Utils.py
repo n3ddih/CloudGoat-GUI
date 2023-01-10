@@ -3,36 +3,18 @@ import shutil
 import git
 import sys
 import subprocess
-
-cloudgoat_path = './cloudgoat'
+import re
 
 def clone_repo(dir, git_url):
     print("Clonning repo...")
     return git.Git(dir).clone(git_url)
 
-def pull_repo(git_folder):
-    print("[*] Pulling codes...")
-    repo = git.Repo(git_folder)
-    return repo.remotes.origin.pull()
-
-def check_repo_changed(git_folder):
-    print("[*] Checking changes in repo...")
-    repo = git.Repo(git_folder)
-    current = repo.head.commit
-    repo.remotes.origin.pull()
-    if current != repo.head.commit:
-        print("[!] The repo changed!")
-        return True
-    return False
-
 def update_cloudgoat():
     # Update CloudGoat repo every first day of the month and if there're any changes
     if datetime.datetime.now().day != 1:
         return False
-    if not check_repo_changed(cloudgoat_path):
-        return False
     
-    pull_repo(cloudgoat_path)
+    clone_repo("./cloudgoat", "https://github.com/RhinoSecurityLabs/cloudgoat.git")
     copy_neccessary_files()
     return True
 
@@ -77,8 +59,8 @@ def copy_neccessary_files():
         shutil.copytree('./cloudgoat/core', './core')
         shutil.copytree('./cloudgoat/scenarios', './scenarios')
         shutil.copy('./cloudgoat/README.md', './cg-README.md')
-        shutil.rmtree('./cloudgoat')
         print("[*] Copy complete!")
+        shutil.rmtree('./cloudgoat')
     except:
         return False
     return True

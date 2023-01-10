@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow py-3">
     <div class="container">
         <a class="navbar-brand" href="#">
-            <img src="static/img/logo.png" class="d-inline-block align-text-top w-auto" height="34">
+            <img src="static/img/logo.png" alt="CloudGoat logo" class="d-inline-block w-auto" height="34">
             CloudGoat GUI
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -13,16 +13,111 @@
                     <a class="nav-link" href="#">Scenarios</a>
                 </li>
             </ul>
-            <li class="nav-item dropdown d-flex">
-                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Menu
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="#">Configure</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
-            </li>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown d-flex">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Menu
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#configModal">Configure Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Terminate all scenario</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
+    
+    <!-- placeholder for alert element -->
+    <div aria-live="polite" aria-atomic="true">
+        <div id="alertPlaceholder" class="toast-container position-absolute top-0 end-0 p-3"></div>
+    </div>
+    <script src="/static/js/alert.js"></script>
+
+    <!-- Modals for configure screens -->
+    <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configModalId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="configModalId">Configure Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    Do you want to add new credentials or use an existing profile?
+                </div>
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-target="#credentialProfile" data-bs-toggle="modal">Credential</button>
+                    <button type="button" class="btn btn-primary" data-bs-target="#profileModal" data-bs-toggle="modal">Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="profileModal" aria-hidden="true" aria-labelledby="profileModalLabel" tabindex="-1">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="profileModalLabel">Configure Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="form-group">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="profile" class="form-label">Profile name: *</label>
+                        <input type="text" name="profile" id="profile" class="form-control" placeholder="Enter the profile name" aria-describedby="Profile" required>
+                        <small id="Profile" class="text-muted">Cloudgoat will use this profile to create resources on AWS</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-target="#configModal" data-bs-toggle="modal">Back</button>
+                    <button type="submit" class="btn btn-secondary">Save</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="credentialModal" aria-hidden="true" aria-labelledby="credentialModalLabel" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="credentialModalLabel">Configure Credential</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="form-group" action="">
+                        <div class="mb-3">
+                            <label for="access_key_id" class="form-label">AWS Access Key ID:</label>
+                            <input type="text" name="access_key_id" id="access_key_id" class="form-control" placeholder="Enter your AWS Access Key Id here" aria-describedby="accessKeyId">
+                            <small id="accessKeyId" class="text-muted">Example: AKIAIOSFODNN7EXAMPLE</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="secret_access_key" class="form-label">AWS Secret Access Key:</label>
+                            <input type="text" name="secret_access_key" id="secret_access_key" class="form-control" placeholder="Enter your AWS Secret Access Key here" aria-describedby="secretAccessKey">
+                            <small id="secretAccessKey" class="text-muted">Example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-target="#configModal" data-bs-toggle="modal">Back</button>
+                    <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>    
+    
+    <script src="static/js/config.js"></script>
+    <!-- <script>
+        var modalId = document.getElementById('modalId');
+    
+        modalId.addEventListener('show.bs.modal', function (event) {
+              // Button that triggered the modal
+              let button = event.relatedTarget;
+              // Extract info from data-bs-* attributes
+              let recipient = button.getAttribute('data-bs-whatever');
+    
+            // Use above variables to manipulate the DOM
+        });
+    </script> -->
+
 </nav>

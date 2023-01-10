@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_cors import CORS
 import Utils
 import datetime
@@ -34,6 +34,26 @@ def scenario_list():
 def scenario_detail(scenario_id):
     results, code = API.scenario_detail()
     return results, code
+
+@app.route('/api/config/profile', methods=['POST'])
+def config_profile():
+    data = request.get_json()
+    profile = data['profile']
+    if profile == '':
+        return "You must include a profile name", 400
+    result, code = API.config_profile(profile)
+    return result, code
+
+@app.route('/api/config/credential', methods=['POST'])
+def config_credential():
+    data = request.get_json()
+    access_key_id = data['access_key_id']
+    secret_key = data['secret_key']
+    if access_key_id == '' or secret_key == '':
+        return "You must include both keys", 400
+    result, code = API.configure_credentials(access_key_id, secret_key)
+    return result, code
+    
 
 if __name__ == '__main__':
     # clone cloudgoat if core or scenarios folder not exist

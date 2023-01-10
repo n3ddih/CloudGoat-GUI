@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "./general/header.html" %}
+</head>
+<body>
+    {% include "./general/navbar.html" %}
+    <div class="shadow-sm" style="background-color: #ededed;">
+        <div class="container">
+            <div class="py-4">
+                <h1>Scenario List</h1>
+                <div class="py-1 px-3 my-3 text-white fs-5 bg-secondary rounded d-inline-flex bd-highlight">
+                    <i class="fa-solid fa-magnifying-glass me-2 lh-base"></i>
+                    Search for scenarios
+                </div>
+                <p class="lead">
+                    Find and search for the available scenarios.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="container pb-2">
+        <form class="input-group flex-nowrap my-3" action="javascript:void(0)" onsubmit="alert(1)">
+            <button type="submit" class="input-group-text" aria-label="Search"><i class="fa-solid fa-magnifying-glass fa-lg text-bold"></i></button>
+            <input type="text" class="form-control" name="search" id="search" aria-describedby="scenarioSearch" placeholder="Enter a scenario name...">
+        </form>
+    </div> 
+    {% include "./general/footer.html" %}
+</body>
+</html>
