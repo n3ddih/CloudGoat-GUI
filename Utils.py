@@ -4,6 +4,9 @@ import git
 import sys
 import subprocess
 import re
+import mistune
+from os import listdir
+from scenario import Scenario
 
 def clone_repo(dir, git_url):
     print("Clonning repo...")
@@ -33,11 +36,11 @@ def check_requirement():
         print("Terraform not found. Please install Terraform before using CloudGoat.")
         sys.exit(1)
 
+    terraform_version = terraform_version_process.stdout.read().decode("utf-8")
     terraform_version_process.wait()
-
     version_number = re.findall(
         r"^Terraform\ v(\d+\.\d+)\.\d+\s",
-        terraform_version_process.stdout.read().decode("utf-8"),
+        terraform_version,
     )
 
     if not version_number:
@@ -64,3 +67,61 @@ def copy_neccessary_files():
     except:
         return False
     return True
+
+def get_scenario_index(markdown_json):
+    for i in range(len(markdown_json)):
+        try:
+            text = markdown_json[i]['children'][0]['text']
+            if text == "Scenarios Available":
+                return i
+        except:
+            continue
+    return 0
+
+def get_max_scenario_name_length():
+    return len(max(listdir('./scenarios'), key=len))
+
+def check_scenario_name(name):
+    regex = r"([A-Za-z0-9]+(_[A-Za-z0-9]+)+)"
+    if len(name) > get_max_scenario_name_length() or not re.match(regex, name) or name not in listdir('./scenarios'):
+        return False
+    return True
+
+def check_scenario_line(line):
+    regex = r"([A-Za-z0-9]+(_[A-Za-z0-9]+)+) \([^)]+\)"
+    if not re.match(regex, line):
+        return False
+    return True
+
+def extract_scenarios(markdown_json):
+    result = []
+    start_index = get_scenario_index(markdown_json)
+    while True:
+        try:
+            text = markdown_json[start_index]['children'][0]['text']
+        except:
+            start_index += 1
+            continue
+        if text == "Usage Guide":
+            break
+        if not check_scenario_line(text):
+            start_index += 1
+            continue
+        text = text.split(' ')
+        name = text[0]
+        size = text[1][1:]
+        difficulty = text[3][:-1]
+        summary = markdown_json[start_index + 2]['children'][0]['text']
+        start_index += 4
+        scenario = Scenario(name, summary, size, difficulty)
+        result.append(scenario.get_detail_info())
+    return result
+
+def get_scenarios_from_markdown():
+    filename = 'cg-README.md'
+    markdown = mistune.create_markdown(renderer='ast')
+    file = open(filename, 'r')
+    md_json = markdown(file.read())
+    file.close()
+    extracted = extract_scenarios(md_json)
+    return extracted

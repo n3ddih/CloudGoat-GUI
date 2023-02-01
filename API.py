@@ -1,31 +1,25 @@
 import os
 import yaml
+import re
 from flask import jsonify
+from pathlib import Path
+from configparser import ConfigParser
+import Utils
 from core.python.commands import CloudGoat
 from core.python.utils import create_or_update_yaml_file
 
 cg = CloudGoat('./')
+default_profile = "cloudgoat"
 
 def scenario_list():
-    results = {}
-    names = os.listdir('./cloudgoat/scenarios')
-    # file = open('./cloudgoat/README.md', 'r', encoding='UTF-8')
-    # data = file.read()
-    for name in names:
-        summary = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget arcu dictum varius duis at. Felis bibendum ut tristique et egestas. Pellentesque sit amet porttitor eget dolor morbi. Ut placerat orci nulla pellentesque dignissim enim.'
-        item = {
-            'summary': summary
-        }
-        results.update({name:item})
-        print(results)
+    results = Utils.get_scenarios_from_markdown()
     return jsonify(results), 200
 
 def scenario_detail(scenario_id):
-    try:
-        scenario_manifest = open(f'./cloudgoat/scenarios/{scenario_id}/manifest.yml', 'r')
-    except FileNotFoundError:
-        return "Scenario not found!", 400
-    loaded = yaml.load(scenario_manifest, Loader=yaml.CLoader)
+    if not Utils.check_scenario_name(scenario_id):
+        return "Invalid scenario id!", 400
+    scenario_manifest = open(f'./scenarios/{scenario_id}/manifest.yml', 'r')
+    loaded = yaml.safe_load(scenario_manifest)
     sname = list(loaded[0].values())[0]
     sauthor = list(loaded[1].values())[0]
     sversion = list(loaded[2].values())[0]
@@ -40,7 +34,7 @@ def scenario_detail(scenario_id):
     }
     return jsonify(results), 200    
 
-def config_profile(profile="cloudgoat"):
+def config_profile(profile):
     # If the profile is not by default, use the input profile
     if profile == "" or profile is None:
         return "Profile name invalid!", 400
@@ -48,11 +42,33 @@ def config_profile(profile="cloudgoat"):
     return "Configure successful!", 200
     
 def configure_credentials(access_key_id, secret_access_key):
-    credentials = open('~/.aws/credentials', 'a')
-    credentials.write("\n[cloudgoat]\naws_access_key_id = "+ access_key_id +"\naws_secret_access_key = "+ secret_access_key +"\n")
-    credentials.close()
-    config = open('~/.aws/config', 'a')
-    config.write("\n[cloudgoat]\nregion = us-east-1\noutput = json")
-    config.close()
-    config_profile()
+    aws_path = str(Path.home()) + '/.aws/'
+    # Create ~/.aws directory if not exist
+    if not os.path.exists(aws_path):
+        os.makedirs(aws_path)
+
+    config = ConfigParser()
+    # Edit credentials file
+    path = aws_path + 'credentials'
+    if os.path.exists(path):
+        config.read(path)
+    config[default_profile] = {
+        'aws_access_key_id': access_key_id,
+        'aws_secret_access_key': secret_access_key
+    }
+    with open(path, 'w') as configfile:
+        config.write(configfile)
+
+    # Edit config file
+    path = aws_path + 'config'
+    if os.path.exists(path):
+        config.read(path)
+    config['profile ' + default_profile] = {
+        'region': 'us-east-1',
+        'output': 'json'
+    }
+    with open(path, 'w') as configfile:
+        config.write(configfile)
+    
+    config_profile(default_profile)
     return "Configure successful!", 200

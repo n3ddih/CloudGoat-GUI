@@ -24,7 +24,27 @@
             <button type="submit" class="input-group-text" aria-label="Search"><i class="fa-solid fa-magnifying-glass fa-lg text-bold"></i></button>
             <input type="text" class="form-control" name="search" id="search" aria-describedby="scenarioSearch" placeholder="Enter a scenario name...">
         </form>
-    </div> 
+    </div>
+    <div class="container pb-2">
+        <div class="row">
+            {%for i in range(0, len)%}
+            <div class="col-sm-6 py-3">
+                <a href="/scenario/{{scenario_list[i]['name']}}" class="text-decoration-none text-dark">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{scenario_list[i]['name']}}</h5>
+                            <p class="card-text overflow-hidden" style="max-height: 70px; min-height: 70px;">{{scenario_list[i]['summary']}}</p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            {{scenario_list[i]['size']}} / {{scenario_list[i]['difficulty']}}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+    
     {% include "./general/footer.html" %}
 </body>
 </html>

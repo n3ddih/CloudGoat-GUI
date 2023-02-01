@@ -1,13 +1,7 @@
-import subprocess
-import sys
 from flask import Flask, render_template, request
 from flask_cors import CORS
 import Utils
-import datetime
-import git
-import shutil
 import os
-import yaml
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +13,8 @@ def index():
 
 @app.route('/scenario_list')
 def view_scenario_list():
-    return render_template('scenario/list.html', title="Scenario List")
+    scenario_list = Utils.get_scenarios_from_markdown()
+    return render_template('scenario/list.html', title="Scenario List", scenario_list=scenario_list, len=len(scenario_list))
 
 @app.route('/scenario/<scenario_id>')
 def view_scenario_detail(scenario_id):
@@ -32,7 +27,7 @@ def scenario_list():
 
 @app.route('/api/scenario/<scenario_id>')
 def scenario_detail(scenario_id):
-    results, code = API.scenario_detail()
+    results, code = API.scenario_detail(scenario_id)
     return results, code
 
 @app.route('/api/config/profile', methods=['POST'])
@@ -48,7 +43,7 @@ def config_profile():
 def config_credential():
     data = request.get_json()
     access_key_id = data['access_key_id']
-    secret_key = data['secret_key']
+    secret_key = data['secret_access_key']
     if access_key_id == '' or secret_key == '':
         return "You must include both keys", 400
     result, code = API.configure_credentials(access_key_id, secret_key)
